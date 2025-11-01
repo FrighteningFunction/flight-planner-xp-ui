@@ -1,35 +1,32 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { apiFetch } from "./logic/queryBackend";
+import "./App.css";
+import { BACKEND_URL } from "./env";
+import { RouteDisplay } from "./components/RouteDisplay";
+import type { RouteStep } from "./datamodels/trip";
 
 function App() {
-  const [count, setCount] = useState(0)
+  let content: ReactNode;
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+  const { data: steps, isLoading, error } = useQuery({
+    queryKey: ["plannedRoute"],
+    queryFn: () =>
+      apiFetch<RouteStep[]>(`${BACKEND_URL}/get-test-route`),
+  });
+
+  if (isLoading) {
+    content = <p>Loading...</p>;
+  } else if (error instanceof Error) {
+    content = <p>Error: {error.message}</p>;
+  } else if (steps && steps.length > 0) {
+    content = <RouteDisplay steps={steps} />;
+  } else {
+    content = <p>No route planned yet.</p>;
+  }
+
+  return <div className="container mt-3">{content}</div>;
 }
 
-export default App
+export default App;
+
