@@ -2,34 +2,48 @@ import type { FlightOffer, Segment } from "../datamodels/flight";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 function FlightSegmentDisplay({ segment }: Readonly<{ segment: Segment }>) {
+
+  const carrierInfoBadge = (
+    <span className="badge text-bg-info fs-6 mx-3">
+      {segment.carrier_code}
+    </span>)
+
+  let arrivalAt = segment.arrival_at ? new Date(segment.arrival_at).toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }) : "Unknown time";
+
+  let departureAt = segment.departure_at ? new Date(segment.departure_at).toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }) : "Unknown time";
+
   return (
-    <div className="d-flex flex-column p-2 mb-2 row-gap-2 align-items-start">
-      <h4>Flight</h4>
+    <div className="d-flex flex-column p-2 mb-2 row-gap-1 align-items-start">
+      <h4>Flight
+        {carrierInfoBadge}
+      </h4>
+      <p>From: {segment.departure_iata}</p>
+      <p>To: {segment.arrival_iata}</p>
 
       <div className="d-flex flex-row align-items-baseline">
         <i className="bi bi-clock me-2"></i>
-        <p>depart at {segment.departure_at}</p>
+        <p>depart at {departureAt}</p>
       </div>
 
       <div className="d-flex flex-row align-items-baseline">
         <i className="bi bi-clock me-2"></i>
-        <p>arrive at {segment.arrival_at}</p>
+        <p>arrive at {arrivalAt}</p>
       </div>
 
-      <p>departure IATA code: {segment.departure_iata}</p>
 
       <p>
+        <i className="bi bi-door-open-fill me-2" style={{color: "blue"}}></i>
         departure terminal: {segment.departure_terminal ?? "—"}{" "}
-        <i className="bi bi-door-open-fill ms-2"></i>
       </p>
-
-      <br />
-
-      <p>arrival IATA code: {segment.arrival_iata}</p>
-
       <p>
+        <i className="bi bi-door-open-fill me-2" style={{color: "blue"}}></i>
         arrival terminal: {segment.arrival_terminal ?? "—"}{" "}
-        <i className="bi bi-door-open-fill ms-2"></i>
       </p>
     </div>
   );
