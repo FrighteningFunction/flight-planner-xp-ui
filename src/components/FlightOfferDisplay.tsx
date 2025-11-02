@@ -3,30 +3,38 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 
 function FlightSegmentDisplay({ segment }: Readonly<{ segment: Segment }>) {
   return (
-    <div className="d-flex flex-column border p-2 mb-2 row-gap-2">
-      <h3>Flight</h3>
-      <div className="d-flex flex-row align-items-center">
-        <p> depart at {segment.departureAt}</p>
-        <i className="bi bi-clock"></i>
+    <div className="d-flex flex-column p-2 mb-2 row-gap-2 align-items-start">
+      <h4>Flight</h4>
+
+      <div className="d-flex flex-row align-items-baseline">
+        <i className="bi bi-clock me-2"></i>
+        <p>depart at {segment.departure_at}</p>
       </div>
-      <div className="d-flex flex-row align-items-center">
-        <p> arrive at {segment.arrivalAt}</p>
-        <i className="bi bi-clock"></i>
+
+      <div className="d-flex flex-row align-items-baseline">
+        <i className="bi bi-clock me-2"></i>
+        <p>arrive at {segment.arrival_at}</p>
       </div>
-      <p> departure IATA code : {segment.departureIata}</p>
+
+      <p>departure IATA code: {segment.departure_iata}</p>
+
       <p>
-        departure terminal : {segment.departureTerminal}
-        <i className="bi bi-door-open-fill"></i>
+        departure terminal: {segment.departure_terminal ?? "—"}{" "}
+        <i className="bi bi-door-open-fill ms-2"></i>
       </p>
+
       <br />
-      <p>arrival IATA code : {segment.arrivalIata}</p>
+
+      <p>arrival IATA code: {segment.arrival_iata}</p>
+
       <p>
-        arrival terminal : {segment.arrivalTerminal}
-        <i className="bi bi-door-open-fill"></i>
+        arrival terminal: {segment.arrival_terminal ?? "—"}{" "}
+        <i className="bi bi-door-open-fill ms-2"></i>
       </p>
     </div>
   );
 }
+
 
 export function FlightOfferDisplay({
   flightoffer,
@@ -34,17 +42,20 @@ export function FlightOfferDisplay({
   flightoffer: FlightOffer;
 }>) {
   return (
-    <div className="d-flex flex-column border p-2 mb-2 row-gap-2">
-      <div className="d-flex flex-row align-items-between gap-1">
-        <h3>Flight</h3>
-        <i className="bi bi-airplane-engines"></i>
+    <div className="d-flex flex-column p-2 mb-2 row-gap-1">
+      <div className="d-flex flex-row align-items-baseline gap-1">
+        <i className="bi bi-airplane-engines fs-4"></i>
+        <h4>Flight</h4>
       </div>
-      <p>
+      <p className="text-lg-start flex-row align-items-baseline fs-5">
+        <i className="bi bi-cash me-1 fs-3" style={{color: "green"}}></i>
         Total Price:{" "}
         {String(flightoffer.price.total)}
+        {" "}
+        {String(flightoffer.price.currency)}
       </p>
       <div>
-        <h3>Itineraries</h3>
+        <h5 className="text-lg-start">Itineraries</h5>
         {flightoffer.itineraries.map((itinerary) =>
           (itinerary.segments || []).map((segment, segindex) => (
             <ul className="list-group" key={segindex}>
