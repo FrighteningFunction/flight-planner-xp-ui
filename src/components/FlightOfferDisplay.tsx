@@ -35,10 +35,10 @@ export function FlightOfferDisplay({
 }>) {
   return (
     <div className="d-flex flex-column border p-2 mb-2 row-gap-2">
-      <p className="d-flex flex-row align-items-between gap-1">
+      <div className="d-flex flex-row align-items-between gap-1">
         <h3>Flight</h3>
         <i className="bi bi-airplane-engines"></i>
-      </p>
+      </div>
       <p>
         Total Price:{" "}
         {String(flightoffer.price.total)}

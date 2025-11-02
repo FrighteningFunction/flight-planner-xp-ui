@@ -28,7 +28,7 @@ function GoogleMapsRouteStepDisplay({ step }: { step: Step }) {
     <div className="d-flex flex-column border p-2 mb-2 row-gap-2">
       <div className="d-flex flex-row align-items-center">
         <i className="bi bi-bus-front"></i>
-        <p>{transitDetails?.transitLine?.vehicle?.name}</p>
+        <p>{transitDetails?.transitLine?.vehicle?.name?.text}</p>
       </div>
       <p>Ride from </p>
       <p>{stopDetails?.departureStop?.name || ""}</p>
