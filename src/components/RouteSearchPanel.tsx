@@ -1,5 +1,5 @@
 import { type ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { apiFetch } from "../logic/queryBackend";
 import { BACKEND_URL } from "../env";
 import { RouteDisplay } from "../components/RouteDisplay";
@@ -13,35 +13,47 @@ if (!BACKEND_URL) {
 }
 
 export function RouteSearchPanel() {
+  const [formData, setFormData] = React.useState({
+    origin: "",
+    destination: "",
+    date: "",
+  });
+
   let routeDisplayPanel: ReactNode;
 
-  const {
-    data: steps,
-    isLoading,
-    error,
-    refetch,
-  } = useQuery({
-    queryKey: ["plannedRoute"],
-    queryFn: async () => {
+  const mutation = useMutation({
+    mutationFn: async (payload: any) => {
       const data = await apiFetch<{ route: RouteStep[] }>(
-        `${BACKEND_URL}/get-test-route`
+        `${BACKEND_URL}/get-route`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
       );
       return data.route;
     },
-    enabled: false,
   });
 
-  const handleSearchClick = (origin: string, destination: string, date: string) => {
-    refetch();
+  const handleSearchClick = (
+    origin: string,
+    destination: string,
+    date: string
+  ) => {
+    mutation.mutate({ origin, destination, date });
   };
 
-  if (isLoading) {
+  if (mutation.isPending) {
     routeDisplayPanel = <p>Loading...</p>;
-  } else if (error instanceof Error) {
-    routeDisplayPanel = <p>Error: {error.message}</p>;
-    logger.error("Error fetching planned route:", error);
-  } else if (steps && steps.length > 0) {
-    routeDisplayPanel = <RouteDisplay steps={steps} />;
+  } else if (mutation.isError) {
+    routeDisplayPanel = (
+      <div className="alert alert-danger" role="alert">
+        {mutation.error.message}
+      </div>
+    );
+    logger.error("Error fetching planned route:", mutation.error);
+  } else if (mutation.data && mutation.data.length > 0) {
+    routeDisplayPanel = <RouteDisplay steps={mutation.data} />;
   } else {
     routeDisplayPanel = <p>No route planned yet.</p>;
   }

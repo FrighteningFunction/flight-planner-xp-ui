@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function MultimodalRouteSearchControls({
   searchMultiModalRoute,
@@ -12,6 +12,12 @@ export function MultimodalRouteSearchControls({
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [date, setDate] = useState(new Date().toISOString());
+
+  const [isSearchEnabled, setIsSearchEnabled] = useState(false);
+
+  useEffect(() => {
+    setIsSearchEnabled(!!origin && !!destination && !!date);
+  }, [origin, destination, date]);
 
   const handleSearch = () => {
     searchMultiModalRoute(origin, destination, date);
@@ -43,7 +49,7 @@ export function MultimodalRouteSearchControls({
         value={date}
         onChange={(e) => setDate(e.target.value)}
       />
-      <button type="button" className="btn btn-primary" onClick={handleSearch}>
+      <button type="button" disabled={!isSearchEnabled} className="btn btn-primary" onClick={handleSearch}>
         Search
       </button>
     </form>
