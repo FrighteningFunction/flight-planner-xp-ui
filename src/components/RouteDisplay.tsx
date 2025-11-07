@@ -1,4 +1,4 @@
-import type { RouteStep } from "../datamodels/trip";
+import type { GenericRoute, RouteStep } from "../datamodels/trip";
 import type { ReactNode } from "react";
 import { FlightOfferDisplay } from "./FlightOfferDisplay";
 import { GoogleMapsRouteDisplay } from "./GoogleRouteDisplay";
@@ -28,14 +28,14 @@ function RouteDisplayStep({ step }: Readonly<{ step: RouteStep }>) {
   );
 }
 
-export function RouteDisplay({ steps }: Readonly<{ steps: RouteStep[] }>) {
-  if (steps.length === 0) {
+export function RouteDisplay({ route }: Readonly<{ route: GenericRoute }>) {
+  if (!route || route.steps.length === 0) {
     return <p>No route found. Try another search.</p>;
   }
 
   return (
     <>
-      {steps.map((step, index) => {
+      {route.steps.map((step: RouteStep, index: any) => {
         const key = `${step.travelMode}-${
           step.startLocation?.latitude ?? "na"
         }-${step.startLocation?.longitude ?? "na"}-${index}`;

@@ -1,39 +1,52 @@
 import { type ReactNode } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { apiFetch } from "../logic/queryBackend";
+import { QueryClient, useMutation } from "@tanstack/react-query";
+import { apiFetch, saveLastRoute } from "../logic/queryBackend";
 import { BACKEND_URL } from "../env";
 import { RouteDisplay } from "../components/RouteDisplay";
-import type { RouteStep } from "../datamodels/trip";
+import type { GenericRoute, RouteStep } from "../datamodels/trip";
 import { logger } from "../logging/logger";
 import React from "react";
 import { MultimodalRouteSearchControls } from "./MultiModalRouteSearchControls";
+import type { Tag } from "../datamodels/Tag";
 
 if (!BACKEND_URL) {
   logger.error("BACKEND_URL is not defined in environment variables.");
 }
 
 export function RouteSearchPanel() {
-  const [formData, setFormData] = React.useState({
-    origin: "",
-    destination: "",
-    date: "",
-  });
+  const [tags, setTags] = React.useState<Tag[]>([]);
 
+  const queryClient = new QueryClient();
+   
   let routeDisplayPanel: ReactNode;
 
   const mutation = useMutation({
     mutationFn: async (payload: any) => {
-      const data = await apiFetch<{ route: RouteStep[] }>(
+      const data = await apiFetch<GenericRoute>(
         `${BACKEND_URL}/get-route`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
+          body: JSON.stringify(payload)
+        },
       );
-      return data.route;
+      return data;
+    },
+    onSuccess() {
+      queryClient.invalidateQueries({queryKey: ['getTags']});
+        
     },
   });
+
+  const onClickSave = async () => {
+    await saveLastRoute();
+  }
+
+  const saveButtonAndTags = (
+    <button className="btn btn-primary" type="button" onClick={onClickSave}>
+      Save
+    </button>
+  );
 
   const handleSearchClick = (
     origin: string,
@@ -52,8 +65,9 @@ export function RouteSearchPanel() {
       </div>
     );
     logger.error("Error fetching planned route:", mutation.error);
-  } else if (mutation.data && mutation.data.length > 0) {
-    routeDisplayPanel = <RouteDisplay steps={mutation.data} />;
+  } else if (mutation.data && mutation.data.steps.length > 0) {
+    routeDisplayPanel = (
+    <RouteDisplay route={mutation.data} />);
   } else {
     routeDisplayPanel = <p>No route planned yet.</p>;
   }
