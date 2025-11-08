@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 import { QueryClient, useMutation } from "@tanstack/react-query";
-import { apiFetch, saveLastRoute } from "../logic/queryBackend";
+import { apiFetch, saveRoute } from "../logic/queryBackend";
 import { BACKEND_URL } from "../env";
 import { RouteDisplay } from "../components/RouteDisplay";
 import type { GenericRoute, RouteStep } from "../datamodels/trip";
@@ -16,37 +16,53 @@ if (!BACKEND_URL) {
 export function RouteSearchPanel() {
   const [tags, setTags] = React.useState<Tag[]>([]);
 
+  const [route, setRoute] = React.useState<GenericRoute | undefined>(undefined);
+
   const queryClient = new QueryClient();
-   
+
   let routeDisplayPanel: ReactNode;
 
   const mutation = useMutation({
     mutationFn: async (payload: any) => {
-      const data = await apiFetch<GenericRoute>(
-        `${BACKEND_URL}/get-route`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        },
-      );
+      const data = await apiFetch<GenericRoute>(`${BACKEND_URL}/get-route`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
       return data;
     },
-    onSuccess() {
-      queryClient.invalidateQueries({queryKey: ['getTags']});
-        
+    onSuccess(data) {
+      setRoute(data);
+      queryClient.invalidateQueries({ queryKey: ["getTags"] });
     },
   });
 
   const onClickSave = async () => {
-    await saveLastRoute();
-  }
+    if (!route) {
+      logger.warn("No route to save.");
+      return;
+    }
+    // update route id here too
+    let route_id = await saveRoute(route);
+    let new_route = route
+    new_route.id = String(route_id);
+    setRoute(new_route);
+    logger.info(`Route saved with ID: ${route_id}`);
+  };
 
-  const saveButtonAndTags = (
-    <button className="btn btn-primary" type="button" onClick={onClickSave}>
-      Save
-    </button>
-  );
+  let saveButtonAndTags: ReactNode;
+
+  if (route && route.steps.length > 0) {
+    saveButtonAndTags = (
+      <button
+        className="btn btn-primary align-self-end"
+        type="button"
+        onClick={onClickSave}
+      >
+        Save This Route
+      </button>
+    );
+  }
 
   const handleSearchClick = (
     origin: string,
@@ -65,9 +81,8 @@ export function RouteSearchPanel() {
       </div>
     );
     logger.error("Error fetching planned route:", mutation.error);
-  } else if (mutation.data && mutation.data.steps.length > 0) {
-    routeDisplayPanel = (
-    <RouteDisplay route={mutation.data} />);
+  } else if (route && route.steps.length > 0) {
+    routeDisplayPanel = <RouteDisplay route={route} />;
   } else {
     routeDisplayPanel = <p>No route planned yet.</p>;
   }
@@ -77,6 +92,7 @@ export function RouteSearchPanel() {
       <MultimodalRouteSearchControls
         searchMultiModalRoute={handleSearchClick}
       />
+      {saveButtonAndTags}
       {routeDisplayPanel}
     </div>
   );

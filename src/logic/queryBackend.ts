@@ -1,4 +1,5 @@
 import type { Tag } from "../datamodels/Tag";
+import type { GenericRoute } from "../datamodels/trip";
 import { BACKEND_URL } from "../env";
 import { logger } from "../logging/logger";
 
@@ -20,20 +21,17 @@ export async function apiFetch<T>(
   return res.json() as Promise<T>;
 }
 
-export async function saveLastRoute(tagids?: string[]): Promise<void> {
-  let url = `${BACKEND_URL}/save-last-route`;
+export async function saveRoute(route: GenericRoute): Promise<number> {
+  let url = `${BACKEND_URL}/save-route`;
 
-  if (tagids && tagids.length > 0) {
-    const params = new URLSearchParams();
-    tagids.forEach((tagid) => params.append("tagids", tagid));
-    url += `?${params.toString()}`;
-  }
-
-  const res = await fetch(url, { method: "GET" });
+  const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(route) });
 
   if (!res.ok) {
     throw new Error(`Error ${res.status}: ${res.statusText}`);
   }
+
+  let route_id = (await res.json())["route_id"];
+  return route_id;
 }
 
 export async function saveTag(name: string): Promise<void> {
