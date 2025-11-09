@@ -24,7 +24,11 @@ export async function apiFetch<T>(
 export async function saveRoute(route: GenericRoute): Promise<number> {
   let url = `${BACKEND_URL}/save-route`;
 
-  const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(route) });
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(route),
+  });
 
   if (!res.ok) {
     throw new Error(`Error ${res.status}: ${res.statusText}`);
@@ -34,16 +38,47 @@ export async function saveRoute(route: GenericRoute): Promise<number> {
   return route_id;
 }
 
-export async function saveTag(name: string): Promise<void> {
+export async function addTag(name: string): Promise<boolean> {
   const res = await fetch(`${BACKEND_URL}/tags`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ name}),
   });
 
   if (!res.ok) {
+    logger.debug(`Failed to add tag with name ${name}`);
     throw new Error(`Error ${res.status}: ${res.statusText}`);
   }
+  return true;
+}
+
+export async function updateTag(id: number, name: string): Promise<boolean> {
+  const res = await fetch(`${BACKEND_URL}/tags/asshole`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, name }),
+  });
+
+  if (!res.ok) {
+    logger.debug(`Failed to update tag with id ${id}`);
+    throw new Error(`Error ${res.status}: ${res.statusText}`);
+  }
+
+  return true;
+}
+
+export async function deleteTag(id: number): Promise<boolean> {
+  const res = await fetch(`${BACKEND_URL}/tags/${id}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) {
+    logger.debug(`Failed to delete tag with id ${id}`);
+    throw new Error(`Error ${res.status}: ${res.statusText}`);
+  }
+
+  return true;
 }
 
 export async function getTags(): Promise<Tag[]> {

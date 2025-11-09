@@ -3,18 +3,15 @@ import { QueryClient, useMutation } from "@tanstack/react-query";
 import { apiFetch, saveRoute } from "../logic/queryBackend";
 import { BACKEND_URL } from "../env";
 import { RouteDisplay } from "../components/RouteDisplay";
-import type { GenericRoute, RouteStep } from "../datamodels/trip";
+import type { GenericRoute } from "../datamodels/trip";
 import { logger } from "../logging/logger";
 import React from "react";
 import { MultimodalRouteSearchControls } from "./MultiModalRouteSearchControls";
-import type { Tag } from "../datamodels/Tag";
-
 if (!BACKEND_URL) {
   logger.error("BACKEND_URL is not defined in environment variables.");
 }
 
 export function RouteSearchPanel() {
-  const [tags, setTags] = React.useState<Tag[]>([]);
 
   const [route, setRoute] = React.useState<GenericRoute | undefined>(undefined);
 
@@ -44,7 +41,7 @@ export function RouteSearchPanel() {
     }
     // update route id here too
     let route_id = await saveRoute(route);
-    let new_route = route
+    let new_route = route;
     new_route.id = String(route_id);
     setRoute(new_route);
     logger.info(`Route saved with ID: ${route_id}`);

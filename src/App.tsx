@@ -9,6 +9,12 @@ import {
   Navigate,
 } from "react-router-dom";
 import { NavBar } from "./components/NavBar";
+import { TagEditorPanel } from "./components/TagEditorPanel";
+import {
+  ToastContainer,
+  toastContext,
+  ToastProvider,
+} from "./components/FlightPlannerToast";
 
 if (!BACKEND_URL) {
   logger.error("BACKEND_URL is not defined in environment variables.");
@@ -16,13 +22,17 @@ if (!BACKEND_URL) {
 
 function App() {
   return (
-    <Router>
-      <NavBar />
-      <Routes>
-        <Route path="/" element={<Navigate to="/search" replace />} />
-        <Route path="/search" element={<RouteSearchPanel />} />
-      </Routes>
-    </Router>
+    <ToastProvider>
+      <Router>
+        <NavBar />
+        <Routes>
+          <Route path="/" element={<Navigate to="/search" replace />} />
+          <Route path="/search" element={<RouteSearchPanel />} />
+          <Route path="/tags" element={<TagEditorPanel />} />
+        </Routes>
+        <ToastContainer />
+      </Router>
+    </ToastProvider>
   );
 }
 

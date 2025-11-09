@@ -13,4 +13,7 @@ export const logger = {
     console.error("[ERROR]", ...args);
     // Optionally send error to backend or Sentry
   },
+  debug: (...args: any[]) => {
+    if (!isProd) console.debug("[DEBUG]", ...args);
+  },
 };
