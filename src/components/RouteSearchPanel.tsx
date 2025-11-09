@@ -9,6 +9,7 @@ import React from "react";
 import { MultimodalRouteSearchControls } from "./MultiModalRouteSearchControls";
 import { RouteTagsDisplay, RouteTagsDropdown } from "./RouteTagsDisplay";
 import { toastContext } from "./FlightPlannerToast";
+import type { Tag } from "../datamodels/Tag";
 if (!BACKEND_URL) {
   logger.error("BACKEND_URL is not defined in environment variables.");
 }
@@ -82,6 +83,13 @@ export function RouteSearchPanel() {
 
   let routeTagsDisplay = <></>;
 
+  const updateRouteTags = (newTags: Tag[]) => {
+    if (route) {
+      setRoute({ ...route, tags: newTags });
+    }
+    queryClient.invalidateQueries({ queryKey: ["getRoutes"] });
+  };
+
   if (mutation.isPending) {
     routeDisplayPanel = <p>Loading...</p>;
   } else if (mutation.isError) {
@@ -94,9 +102,9 @@ export function RouteSearchPanel() {
   } else if (route && route.steps.length > 0) {
     routeTagsDisplay = (
       <>
-        <RouteTagsDisplay tags={route.tags} />
+        <RouteTagsDisplay tags={route.tags} setTags={updateRouteTags} />
         <RouteTagsDropdown currentTags={route.tags}
-          setRouteTags={(newTags) => setRoute({ ...route, tags: newTags })}
+          setRouteTags={updateRouteTags}
         />
       </>
     );
