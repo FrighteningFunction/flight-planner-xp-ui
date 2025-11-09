@@ -25,7 +25,7 @@ export function RouteSearchPanel() {
 
   const mutation = useMutation({
     mutationFn: async (payload: any) => {
-      const data = await apiFetch<GenericRoute>(`${BACKEND_URL}/get-test-route`, {
+      const data = await apiFetch<GenericRoute>(`${BACKEND_URL}/get-route`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

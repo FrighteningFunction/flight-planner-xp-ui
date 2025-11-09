@@ -1,4 +1,4 @@
-import { Dropdown } from "react-bootstrap";
+import { Dropdown, DropdownItem } from "react-bootstrap";
 import type { Tag } from "../datamodels/Tag";
 import React, { use, useState } from "react";
 import { getTags } from "../logic/queryBackend";
@@ -41,7 +41,7 @@ export function RouteTagsDropdown({
 }>) {
   // This holds *all available* tags from backend
   const { data, isLoading, error } = useQuery<Tag[], Error>({
-    queryKey: ["allTags"],
+    queryKey: ["getTags"],
     queryFn: getTags,
   });
 
@@ -53,7 +53,7 @@ export function RouteTagsDropdown({
 
   let tagsList: React.ReactNode = <></>;
 
-  if (data) {
+  if (data?.length && data?.length > 0) {
     tagsList = data.map((tag) => {
       if (currentTags.some((t) => t.id === tag.id)) {
         return null; // Skip tags already assigned to the route
@@ -75,6 +75,8 @@ export function RouteTagsDropdown({
         </Dropdown.Item>
       );
     });
+  }else{
+    tagsList =  [<Dropdown.Item key={0} disabled={true}>No tags just yet!</Dropdown.Item>];
   }
 
   return (

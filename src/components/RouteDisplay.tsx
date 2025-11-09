@@ -35,6 +35,7 @@ export function RouteDisplay({ route }: Readonly<{ route: GenericRoute }>) {
 
   return (
     <>
+      <h3>{route.searchStart} to {route.searchEnd}</h3>
       {route.steps.map((step: RouteStep, index: any) => {
         const key = `${step.travelMode}-${
           step.startLocation?.latitude ?? "na"

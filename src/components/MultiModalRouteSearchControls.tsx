@@ -29,6 +29,7 @@ export function MultimodalRouteSearchControls({
         className="form-control mb-2"
         type="text"
         placeholder="Where from?"
+        required={true}
         value={origin}
         onChange={(e) => setOrigin(e.target.value)}
       />
@@ -37,6 +38,7 @@ export function MultimodalRouteSearchControls({
         type="text"
         placeholder="Where to?"
         value={destination}
+        required={true}
         onChange={(e) => setDestination(e.target.value)}
       />
       <label htmlFor="travel-date" className="form-label">
@@ -47,6 +49,7 @@ export function MultimodalRouteSearchControls({
         type="date"
         id="travel-date"
         value={date}
+        min={new Date().toISOString().split("T")[0]}
         onChange={(e) => setDate(e.target.value)}
       />
       <button type="button" disabled={!isSearchEnabled} className="btn btn-primary" onClick={handleSearch}>
