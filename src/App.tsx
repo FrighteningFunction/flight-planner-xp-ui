@@ -13,6 +13,7 @@ import {
   ToastContainer,
   ToastProvider,
 } from "./components/FlightPlannerToast";
+import { RouteCollectionDisplay } from "./components/RouteCollectionDisplay";
 
 if (!BACKEND_URL) {
   logger.error("BACKEND_URL is not defined in environment variables.");
@@ -27,6 +28,7 @@ function App() {
           <Route path="/" element={<Navigate to="/search" replace />} />
           <Route path="/search" element={<RouteSearchPanel />} />
           <Route path="/tags" element={<TagEditorPanel />} />
+          <Route path="/collection" element={<RouteCollectionDisplay />} />
         </Routes>
         <ToastContainer />
       </Router>

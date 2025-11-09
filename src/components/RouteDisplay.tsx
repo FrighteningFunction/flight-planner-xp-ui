@@ -67,9 +67,11 @@ export function RouteDisplay({
     }
     if (route_id) addToast("success", "Route saved successfully");
 
-    let new_route = route;
-    new_route.id = String(route_id);
-    setRoute(new_route);
+    if (!route.id) {
+      let new_route = route;
+      new_route.id = String(route_id);
+      setRoute(new_route);
+    }
     logger.info(`Route saved with ID: ${route_id}`);
   };
 

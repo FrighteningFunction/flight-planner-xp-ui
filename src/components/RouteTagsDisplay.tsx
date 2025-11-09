@@ -4,18 +4,31 @@ import React, { use, useState } from "react";
 import { getTags } from "../logic/queryBackend";
 import { useQuery } from "@tanstack/react-query";
 
-export function RouteTagsDisplay({ tags, setTags }: Readonly<{ tags: Tag[]; setTags: (tags: Tag[]) => void }>) {
+export function RouteTagsDisplay({
+  tags,
+  setTags,
+  direction = "vertical",
+}: Readonly<{
+  tags: Tag[];
+  setTags: (tags: Tag[]) => void;
+  direction?: "horizontal" | "vertical";
+}>) {
   if (!tags || tags.length === 0) return <></>;
+
+  const stackType = direction === "horizontal" ? "h-stack" : "v-stack";
 
   const removeTag = (tagToRemove: Tag) => {
     const updatedTags = tags.filter((tag) => tag.id !== tagToRemove.id);
     setTags(updatedTags);
-  }
+  };
 
   return (
-    <div className="bs-dark p-2 mb-3 h-stack gap-2">
+    <div className={`bs-dark p-2 mb-3 ${stackType} gap-2`}>
       {tags.map((tag) => (
-        <span key={tag.id} className="d-flex flex-row align-items-center badge bg-light py-0 text-dark">
+        <span
+          key={tag.id}
+          className="d-flex flex-row align-items-center badge bg-light py-0 text-dark"
+        >
           <i className="bi bi-tag-fill me-1"></i>
           {tag.name}
           <button
@@ -24,7 +37,7 @@ export function RouteTagsDisplay({ tags, setTags }: Readonly<{ tags: Tag[]; setT
             aria-label="Remove tag"
             onClick={() => removeTag(tag)}
           >
-            <i className = "bi bi-x text-danger"></i>
+            <i className="bi bi-x text-danger"></i>
           </button>
         </span>
       ))}
@@ -75,13 +88,17 @@ export function RouteTagsDropdown({
         </Dropdown.Item>
       );
     });
-  }else{
-    tagsList =  [<Dropdown.Item key={0} disabled={true}>No tags just yet!</Dropdown.Item>];
+  } else {
+    tagsList = [
+      <Dropdown.Item key={0} disabled={true}>
+        No tags just yet!
+      </Dropdown.Item>,
+    ];
   }
 
   return (
     <Dropdown>
-      <Dropdown.Toggle variant="success" id="dropdown-basic">
+      <Dropdown.Toggle variant="secondary" id="dropdown-basic">
         Add a tag
       </Dropdown.Toggle>
 
