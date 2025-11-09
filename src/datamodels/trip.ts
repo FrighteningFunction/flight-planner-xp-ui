@@ -12,6 +12,6 @@ export interface RouteStep {
 export interface GenericRoute {
     id: string;
     steps: RouteStep[];
-    tags: Tag[] | undefined;
+    tags: Tag[];
     createdAt: string;
 }

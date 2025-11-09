@@ -7,13 +7,16 @@ import type { GenericRoute } from "../datamodels/trip";
 import { logger } from "../logging/logger";
 import React from "react";
 import { MultimodalRouteSearchControls } from "./MultiModalRouteSearchControls";
+import { RouteTagsDisplay, RouteTagsDropdown } from "./RouteTagsDisplay";
+import { toastContext } from "./FlightPlannerToast";
 if (!BACKEND_URL) {
   logger.error("BACKEND_URL is not defined in environment variables.");
 }
 
 export function RouteSearchPanel() {
-
   const [route, setRoute] = React.useState<GenericRoute | undefined>(undefined);
+
+  const { addToast } = React.useContext(toastContext);
 
   const queryClient = new QueryClient();
 
@@ -21,7 +24,7 @@ export function RouteSearchPanel() {
 
   const mutation = useMutation({
     mutationFn: async (payload: any) => {
-      const data = await apiFetch<GenericRoute>(`${BACKEND_URL}/get-route`, {
+      const data = await apiFetch<GenericRoute>(`${BACKEND_URL}/get-test-route`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -40,7 +43,15 @@ export function RouteSearchPanel() {
       return;
     }
     // update route id here too
-    let route_id = await saveRoute(route);
+    let route_id: number | undefined = undefined;
+    try {
+      route_id = await saveRoute(route);
+    } catch (e) {
+      addToast("danger", `Error saving route: ${(e as Error).message}`);
+      return;
+    }
+    if (route_id) addToast("success", "Route saved successfully");
+
     let new_route = route;
     new_route.id = String(route_id);
     setRoute(new_route);
@@ -52,7 +63,7 @@ export function RouteSearchPanel() {
   if (route && route.steps.length > 0) {
     saveButtonAndTags = (
       <button
-        className="btn btn-primary align-self-end"
+        className="btn btn-primary align-self-start"
         type="button"
         onClick={onClickSave}
       >
@@ -69,6 +80,8 @@ export function RouteSearchPanel() {
     mutation.mutate({ origin, destination, date });
   };
 
+  let routeTagsDisplay = <></>;
+
   if (mutation.isPending) {
     routeDisplayPanel = <p>Loading...</p>;
   } else if (mutation.isError) {
@@ -79,18 +92,30 @@ export function RouteSearchPanel() {
     );
     logger.error("Error fetching planned route:", mutation.error);
   } else if (route && route.steps.length > 0) {
+    routeTagsDisplay = (
+      <>
+        <RouteTagsDisplay tags={route.tags} />
+        <RouteTagsDropdown currentTags={route.tags}
+          setRouteTags={(newTags) => setRoute({ ...route, tags: newTags })}
+        />
+      </>
+    );
     routeDisplayPanel = <RouteDisplay route={route} />;
   } else {
     routeDisplayPanel = <p>No route planned yet.</p>;
   }
 
   const content = (
-    <div className="d-flex flex-column gap-4 my-2">
+    <div className="d-flex flex-column my-2 gap-2">
       <MultimodalRouteSearchControls
         searchMultiModalRoute={handleSearchClick}
       />
-      {saveButtonAndTags}
-      {routeDisplayPanel}
+      <br />
+      <div className = "d-flex flex-row gap-3">
+        {routeTagsDisplay}
+        {saveButtonAndTags}
+      </div>
+        {routeDisplayPanel}
     </div>
   );
 
