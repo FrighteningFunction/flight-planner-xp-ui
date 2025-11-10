@@ -15,7 +15,7 @@ export function RouteTagsDisplay({
 }>) {
   if (!tags || tags.length === 0) return <></>;
 
-  const stackType = direction === "horizontal" ? "h-stack" : "v-stack";
+  const stackType = direction === "horizontal" ? "hstack" : "vstack";
 
   const removeTag = (tagToRemove: Tag) => {
     const updatedTags = tags.filter((tag) => tag.id !== tagToRemove.id);
@@ -23,7 +23,7 @@ export function RouteTagsDisplay({
   };
 
   return (
-    <div className={`bs-dark p-2 mb-3 ${stackType} gap-2`}>
+    <div className={`${stackType} gap-2 align-items-center`}>
       {tags.map((tag) => (
         <span
           key={tag.id}

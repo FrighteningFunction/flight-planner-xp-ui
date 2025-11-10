@@ -53,7 +53,7 @@ export function RouteSearchPanel() {
       </div>
     );
     logger.error("Error fetching planned route:", mutation.error);
-  } else if (route && route.steps.length > 0) {
+  } else if (route && route?.steps?.length > 0) {
     routeDisplayPanel = <RouteDisplay route={route} setRoute={setRoute} />;
   } else {
     routeDisplayPanel = <p>No route planned yet.</p>;

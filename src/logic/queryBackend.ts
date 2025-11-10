@@ -38,6 +38,20 @@ export async function saveRoute(route: GenericRoute): Promise<number> {
   return route_id;
 }
 
+export async function deleteRoute(route_id: number): Promise<boolean> {
+  const res = await fetch(`${BACKEND_URL}/routes/${route_id}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) {
+    logger.debug(`Failed to delete route with id ${route_id}`);
+    throw new Error(`Error ${res.status}: ${res.statusText}`);
+  }
+  
+  return true;
+}
+
 export async function addTag(name: string): Promise<boolean> {
   const res = await fetch(`${BACKEND_URL}/tags`, {
     method: "POST",

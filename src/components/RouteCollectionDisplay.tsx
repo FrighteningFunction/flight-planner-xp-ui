@@ -40,6 +40,7 @@ function RouteListElement({
   selectedId?: string;
   setSelectedId: React.Dispatch<React.SetStateAction<string | undefined>>;
 }>) {
+
   const content = (
     <li
       className={
@@ -51,6 +52,9 @@ function RouteListElement({
       <strong>
         {route.searchStart} to {route.searchEnd}
       </strong>
+      <span className="text-muted">
+        {new Date(route.createdAt).toLocaleString()}
+      </span>
       <div className="d-flex flex-row gap-1 ms-auto">
         {route.tags.map((tag) => (
           <span

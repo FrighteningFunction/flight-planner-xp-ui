@@ -8,7 +8,7 @@ import { toastContext } from "./FlightPlannerToast";
 import React from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { logger } from "../logging/logger";
-import { saveRoute } from "../logic/queryBackend";
+import { deleteRoute, saveRoute } from "../logic/queryBackend";
 
 function RouteDisplayStep({ step }: Readonly<{ step: RouteStep }>) {
   let content: ReactNode;
@@ -37,13 +37,13 @@ export function RouteDisplay({
   route,
   setRoute,
 }: Readonly<{ route: GenericRoute; setRoute: (route: GenericRoute) => void }>) {
-  if (!route || route.steps.length === 0) {
-    return <p>No route found. Try another search.</p>;
-  }
-
   const queryClient = useQueryClient();
 
   const { addToast } = React.useContext(toastContext);
+
+  if (!route?.steps || route.steps.length === 0) {
+    return <p>No route found. Try another search.</p>;
+  }
 
   const updateRouteTags = (newTags: Tag[]) => {
     if (route) {
@@ -79,18 +79,18 @@ export function RouteDisplay({
   };
 
   const routeTagsDisplay = (
-    <>
-      <RouteTagsDisplay tags={route.tags} setTags={updateRouteTags} />
+    <div className="d-flex flex-row align-items-center gap-1">
+      <RouteTagsDisplay tags={route.tags} direction="horizontal"setTags={updateRouteTags} />
       <RouteTagsDropdown
         currentTags={route.tags}
         setRouteTags={updateRouteTags}
       />
-    </>
+    </div>
   );
 
   let saveButtonAndTags: ReactNode = <></>;
 
-  if (route && route.steps.length > 0) {
+  if (route && route?.steps?.length > 0) {
     const buttonText = route.id ? "Update Route" : "Save Route";
     saveButtonAndTags = (
       <button
@@ -103,11 +103,39 @@ export function RouteDisplay({
     );
   }
 
+  const handleDeleteClick = async () => {
+    setRoute({} as GenericRoute);
+    let success = false;
+    try {
+      success = await deleteRoute(Number(route?.id));
+    } catch (error) {
+      addToast("danger", `Error deleting route: ${(error as Error).message}`);
+    }
+    if (success) {
+      addToast("success", "Route deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["getRoutes"] });
+    }
+  };
+
+  const deleteButton = (
+    <button
+      className="btn btn-danger align-self-start"
+      type="button"
+      onClick={handleDeleteClick}
+      disabled={!route || route.steps?.length === 0 || !route.id}
+    >
+      Delete Route
+    </button>
+  );
+
   const mainBody = (
     <>
-      <h3>
-        {route.searchStart} to {route.searchEnd}
-      </h3>
+      <div className="d-flex flex-row align-items-center justify-content-between">
+        <h3>
+          {route.searchStart} to {route.searchEnd}
+        </h3>
+        {routeTagsDisplay}
+      </div>
       {route.steps.map((step: RouteStep, index: any) => {
         const key = `${step.travelMode}-${
           step.startLocation?.latitude ?? "na"
@@ -120,9 +148,9 @@ export function RouteDisplay({
 
   return (
     <div className="d-flex flex-column gap-3">
-      <div className="d-flex fley-row gap-1">
-        {routeTagsDisplay}
+      <div className="d-flex flex-row gap-1">
         {saveButtonAndTags}
+        {deleteButton}
       </div>
       {mainBody}
     </div>
