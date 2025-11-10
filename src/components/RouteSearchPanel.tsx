@@ -1,8 +1,5 @@
 import { type ReactNode } from "react";
-import {
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "../logic/queryBackend";
 import { BACKEND_URL } from "../env";
 import { RouteDisplay } from "../components/RouteDisplay";
@@ -23,7 +20,7 @@ export function RouteSearchPanel() {
 
   const mutation = useMutation({
     mutationFn: async (payload: any) => {
-      const data = await apiFetch<GenericRoute>(`${BACKEND_URL}/get-test-route`, {
+      const data = await apiFetch<GenericRoute>(`${BACKEND_URL}/get-route`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -47,11 +44,19 @@ export function RouteSearchPanel() {
   if (mutation.isPending) {
     routeDisplayPanel = <p>Loading...</p>;
   } else if (mutation.isError) {
-    routeDisplayPanel = (
-      <div className="alert alert-danger" role="alert">
-        {mutation.error.message}
-      </div>
-    );
+    if (new RegExp(/Error 404/).exec(mutation.error.message)) {
+      routeDisplayPanel = (
+        <div className="alert alert-info" role="alert">
+          {"We can't find a way there. :( Try more precise locations or a different date."}
+        </div>
+      );
+    } else {
+      routeDisplayPanel = (
+        <div className="alert alert-danger" role="alert">
+          {mutation.error.message}
+        </div>
+      );
+    }
     logger.error("Error fetching planned route:", mutation.error);
   } else if (route && route?.steps?.length > 0) {
     routeDisplayPanel = <RouteDisplay route={route} setRoute={setRoute} />;
@@ -61,6 +66,7 @@ export function RouteSearchPanel() {
 
   const content = (
     <div className="d-flex flex-column my-2 gap-2">
+      <h2>Plan Your Route</h2>
       <MultimodalRouteSearchControls
         searchMultiModalRoute={handleSearchClick}
       />

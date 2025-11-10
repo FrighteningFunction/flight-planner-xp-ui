@@ -24,19 +24,27 @@ export function MultimodalRouteSearchControls({
   };
 
   return (
-    <form>
+    <form className="w-75">
+      <label htmlFor="origin-input" className="form-label">
+        From:
+      </label>
       <input
         className="form-control mb-2"
         type="text"
-        placeholder="Where from?"
+        id="origin-input"
+        placeholder="Eg. Budapest, Hosok Tere"
         required={true}
         value={origin}
         onChange={(e) => setOrigin(e.target.value)}
       />
+      <label htmlFor="destination-input" className="form-label">
+        To:
+      </label>
       <input
         className="form-control mb-2"
         type="text"
-        placeholder="Where to?"
+        id="destination-input"
+        placeholder="Eg. New York"
         value={destination}
         required={true}
         onChange={(e) => setDestination(e.target.value)}

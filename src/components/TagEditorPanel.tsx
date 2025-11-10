@@ -2,7 +2,7 @@ import React from "react";
 import type { Tag } from "../datamodels/Tag";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { addTag, deleteTag, getTags, updateTag } from "../logic/queryBackend";
-import {toastContext } from "./FlightPlannerToast";
+import { toastContext } from "./FlightPlannerToast";
 
 export function TagEditorPanel() {
   const [isAdding, setIsAdding] = React.useState(false);
@@ -62,6 +62,9 @@ export function TagEditorPanel() {
       <button className="btn btn-primary mt-2" type="submit">
         Add Tag
       </button>
+      <button className="btn btn-secondary mt-2 ms-2" type="button" onClick={() => setIsAdding(false)}>
+        Cancel
+      </button>
     </form>
   );
 
@@ -94,10 +97,11 @@ export function TagEditorPanel() {
     );
   } else {
     content = (
-      <>
+      <div className="container mt-3">
+        <h2 className="pb-3">Your Tags</h2>
         {tagsList}
-        {addTagContent}
-      </>
+        <div className="pt-4">{addTagContent}</div>
+      </div>
     );
   }
   return content;
@@ -151,9 +155,14 @@ function TagDisplay({ tag }: Readonly<{ tag: Tag }>) {
         if (e.key === "Enter") {
           e.preventDefault(); // stop form submission
           handleSave();
+        }else if (e.key === "Escape") {
+          e.preventDefault();
+          setIsEditing(false);
+          setEditedName(tag.name);
         }
       }}
       className="form-control"
+      autoFocus={true}
     />
   ) : (
     tag.name
@@ -161,7 +170,6 @@ function TagDisplay({ tag }: Readonly<{ tag: Tag }>) {
 
   return (
     <li
-      key={tag.id}
       className="list-group-item d-flex justify-content-between align-items-center"
     >
       <div className="d-flex flex-row gap-1">

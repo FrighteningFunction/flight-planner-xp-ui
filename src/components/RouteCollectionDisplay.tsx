@@ -40,7 +40,6 @@ function RouteListElement({
   selectedId?: string;
   setSelectedId: React.Dispatch<React.SetStateAction<string | undefined>>;
 }>) {
-
   const content = (
     <li
       className={
@@ -154,26 +153,27 @@ export function RouteCollectionDisplay() {
 
   if (!routes || routes.length === 0) {
     content = (
-      <div className="container mt-3">
-        <div className="alert alert-info" role="alert">
-          No routes yet, time to start searching!
-        </div>
+      <div className="alert alert-info" role="alert">
+        No routes yet, time to start searching!
       </div>
     );
   } else {
     content = (
-      <div className="container mt-3">
-        <div className="d-flex flex-column gap-4">
-          <RouteListDisplay
-            routes={routes}
-            selectedId={selectedId}
-            setSelectedId={setSelectedId}
-          />
-          {routeDetailsDisplay}
-        </div>
+      <div className="d-flex flex-column gap-4">
+        <RouteListDisplay
+          routes={routes}
+          selectedId={selectedId}
+          setSelectedId={setSelectedId}
+        />
+        {routeDetailsDisplay}
       </div>
     );
   }
 
-  return content;
+  return (
+    <div className="container mt-3">
+      <h2 className="pb-3">Your Saved Routes</h2>
+      {content}
+    </div>
+  );
 }
