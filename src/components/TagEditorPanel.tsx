@@ -1,6 +1,5 @@
-import React, { use } from "react";
+import React from "react";
 import type { Tag } from "../datamodels/Tag";
-import { logger } from "../logging/logger";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { addTag, deleteTag, getTags, updateTag } from "../logic/queryBackend";
 import {toastContext } from "./FlightPlannerToast";
@@ -56,7 +55,7 @@ export function TagEditorPanel() {
     >
       <input
         type="text"
-        className="form-control"
+        className="form-control w-50"
         placeholder="New tag name"
         onChange={(e) => setNewTagName(e.target.value)}
       />
@@ -119,10 +118,11 @@ function TagDisplay({ tag }: Readonly<{ tag: Tag }>) {
     } catch (error) {
       addToast("danger", `Error updating tag: ${(error as Error).message}`);
     }
-    queryClient.invalidateQueries({ queryKey: ["getTags"] });
     setIsEditing(false);
     if (success) {
       addToast("success", "Tag updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["getTags"] });
+      queryClient.invalidateQueries({ queryKey: ["getRoutes"] });
     }
   };
 
@@ -134,9 +134,10 @@ function TagDisplay({ tag }: Readonly<{ tag: Tag }>) {
       addToast("danger", `Error deleting tag: ${(error as Error).message}`);
       return;
     }
-    queryClient.invalidateQueries({ queryKey: ["getTags"] });
     if (success) {
       addToast("success", "Tag deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["getTags"] });
+      queryClient.invalidateQueries({ queryKey: ["getRoutes"] });
     }
   };
 

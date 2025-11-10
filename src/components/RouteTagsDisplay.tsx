@@ -1,6 +1,6 @@
-import { Dropdown, DropdownItem } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import type { Tag } from "../datamodels/Tag";
-import React, { use, useState } from "react";
+import React from "react";
 import { getTags } from "../logic/queryBackend";
 import { useQuery } from "@tanstack/react-query";
 

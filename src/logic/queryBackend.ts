@@ -53,7 +53,7 @@ export async function addTag(name: string): Promise<boolean> {
 }
 
 export async function updateTag(id: number, name: string): Promise<boolean> {
-  const res = await fetch(`${BACKEND_URL}/tags/asshole`, {
+  const res = await fetch(`${BACKEND_URL}/tags`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ id, name }),

@@ -65,7 +65,10 @@ export function RouteDisplay({
       addToast("danger", `Error saving route: ${(e as Error).message}`);
       return;
     }
-    if (route_id) addToast("success", "Route saved successfully");
+    if (route_id) {
+      addToast("success", "Route saved successfully");
+      queryClient.invalidateQueries({ queryKey: ["getRoutes"] });
+    }
 
     if (!route.id) {
       let new_route = route;
